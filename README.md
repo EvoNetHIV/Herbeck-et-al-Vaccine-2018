@@ -38,9 +38,6 @@ The vaccine parameters related to duration and the effect on transmission/infect
 
 Antiretroviral therapy (ART) became available in 2012 in the heterosexual South African model, and was available at all time points in the MSM model. In both models, individuals became eligible for treatment at CD4<350 and population coverage was set at approximately 30% and 40%, for the HET and MSM models, respectively. Identical ART scenarios were included in the counterfactual epidemic scenarios (no vaccine and vaccine with no viral variation) and the epidemic scenarios that included viral resistance to the vaccine effect.
 
-### Authors of EvoNetHIV and ViralDynamics
+### Contact
 
-* Steve Goodreau <goodreau@uw.edu>
 * Josh Herbeck <herbeck@uw.edu>
-* John Mittler <jmittler@uw.edu>
-* James Murphy <jtm6@uw.edu>
