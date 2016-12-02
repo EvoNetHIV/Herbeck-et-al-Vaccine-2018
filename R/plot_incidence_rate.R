@@ -79,5 +79,5 @@ incidence_rate_plot<-function(model_obj){
     }
   }
   lines(1:nyears,colMeans(result_mat),type='o',pch=16,lwd=2,col="darkblue")
-  title("incidence rate per 100 person years")
+  mtext("incidence rate per 100 person years",side=3,line=2.7,col="blue")
 }

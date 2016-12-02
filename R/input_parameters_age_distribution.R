@@ -1,7 +1,11 @@
 #' @export
 input_parameters_age_distribution <- function(data_name="usa_men_18_to_100",min_age,max_age)
 {
+  if(is.null(data_name)){
+    data_name <- "usa_men_18_to_100"
+  }
   #description: returns initial age distribution for population
+  #called in "input_parameters_derived"
   
   age_dist_data_list <- list()
   ########## Alternative AMSR tables that include elderly persons. #########################
@@ -35,12 +39,53 @@ input_parameters_age_distribution <- function(data_name="usa_men_18_to_100",min_
         0.0069, 0.0066, 0.0062, 0.0059, 0.0056, 0.0052, 0.0048, 0.0044,
         0.0040, 0.0036, 0.0032, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001,
         0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001,
-        0.0001)) 
-
+        0.0001),age_range=c(18,100))
+    age_dist_data_list$"south_africa_male_16_to_100" <- list(
+      age_dist= c(0.0360,0.0360,0.0360,0.0360,
+                  0.0293,0.0293,0.0293,0.0293,0.0293,
+                  0.0276,0.0276,0.0276,0.0276,0.0276,
+                  0.0224,0.0224,0.0224,0.0224,0.0224,
+                  0.0191,0.0191,0.0191,0.0191,0.0191,
+                  0.0163,0.0163,0.0163,0.0163,0.0163,
+                  0.0140,0.0140,0.0140,0.0140,0.0140,
+                  0.0120,0.0120,0.0120,0.0120,0.0120,
+                  0.0100,0.0100,0.0100,0.0100,0.0100,
+                  0.0077,0.0077,0.0077,0.0077,0.0077,
+                  0.0054,0.0054,0.0054,0.0054,0.0054,
+                  0.0036,0.0036,0.0036,0.0036,0.0036,
+                  0.0022,0.0022,0.0022,0.0022,0.0022,
+                  0.0004,0.0004,0.0004,0.0004,0.0004,
+                  0.0004,0.0004,0.0004,0.0004,0.0004,
+                  0.0004,0.0004,0.0004,0.0004,0.0004,
+                  0.0004,0.0004,0.0004,0.0004,0.0004,
+                  0.0004),age_range=c(16,100))
+    age_dist_data_list$"south_africa_female_16_to_100" <- list(
+      age_dist= c(0.0330,0.0330,0.0330,0.0330,
+                  0.0265,0.0265,0.0265,0.0265,0.0265,
+                  0.0249,0.0249,0.0249,0.0249,0.0249,
+                  0.0210,0.0210,0.0210,0.0210,0.0210,
+                  0.0180,0.0180,0.0180,0.0180,0.0180,
+                  0.0167,0.0167,0.0167,0.0167,0.0167,
+                  0.0151,0.0151,0.0151,0.0151,0.0151,
+                  0.0131,0.0131,0.0131,0.0131,0.0131,
+                  0.0111,0.0111,0.0111,0.0111,0.0111,
+                  0.0088,0.0088,0.0088,0.0088,0.0088,
+                  0.0070,0.0070,0.0070,0.0070,0.0070,
+                  0.0051,0.0051,0.0051,0.0051,0.0051,
+                  0.0033,0.0033,0.0033,0.0033,0.0033,
+                  0.0007,0.0007,0.0007,0.0007,0.0007,
+                  0.0007,0.0007,0.0007,0.0007,0.0007,
+                  0.0007,0.0007,0.0007,0.0007,0.0007,
+                  0.0007,0.0007,0.0007,0.0007,0.0007,
+                  0.0007),age_range=c(16,100))
+      
+  data_range <- (age_dist_data_list[[data_name]]$age_range[1]:
+                   age_dist_data_list[[data_name]]$age_range[2])
+  user_age_range        <- min_age : (max_age-1)
+  #age_dist_index   <- user_age_index - min_age + 1
+  data_ix <- match(user_age_range,data_range)
+  initial_age_dist <- age_dist_data_list[[data_name]]$age_dist[data_ix]
   
-  age_index        <- min_age : (max_age-1)
-  age_dist_index   <- age_index - min_age + 1
-  initial_age_dist <- age_dist_data_list[[data_name]]$age_dist[age_dist_index]
   final_age_dist   <- initial_age_dist/sum(initial_age_dist)
   return(final_age_dist)
 }

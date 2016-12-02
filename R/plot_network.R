@@ -10,6 +10,15 @@ plot_network_fxn <-function(dat,at)
   #exit if "save_network==T" (except if first timestep),
   #as plotting doesn't work well on network with complete history
   if(dat$param$save_network== TRUE & at>2){return(dat)} 
+  #TODO: could just extract current time point to plot? 
+
+  
+  # if we are in fast_edgelist mode, construct a network from the edgelist
+  if(is.null(dat[['nw']])){
+    nw <- as.network.matrix(dat$el,matrix.type='edgelist',directed=FALSE)
+  } else {
+    nw <- dat$nw
+  }
     
   #color from low to high values (spvl, connectivity)
   color_vec <- c("white","orange","yellow","red","purple","black")
@@ -37,10 +46,11 @@ plot_network_fxn <-function(dat,at)
   color_ix <- rep("white",length(dat$attr$status_evo))
   color_ix[inf_index] <- color_vec[spvl_label]
   
-  if(length(which(dat$attr$active ==1))<=100)
-     plot(dat$nw,vertex.col=color_ix,label="id",label.cex=.85,vertex.sides=pch_vec)  
-  else
-     plot(dat$nw,vertex.col=color_ix,vertex.sides=pch_vec)
+  if(length(which(dat$attr$active ==1))<=100 & !is.null(dat[['nw']])){
+     plot(nw,vertex.col=color_ix,label="id",label.cex=.85,vertex.sides=pch_vec)  
+  } else {
+     plot(nw,vertex.col=color_ix,vertex.sides=pch_vec)
+  }
   
     mtext(paste("network at day: ",at," (dark = high VL)"),side=3)
   
@@ -51,12 +61,14 @@ plot_network_fxn <-function(dat,at)
     inf_index <- which(dat$attr$status_evo >=0 & dat$attr$active ==1) 
     color_ix <- color_vec[dat$pop$att1[inf_index]] 
   
-  if(length(which(dat$attr$active ==1))<=100)
-    plot(dat$nw, vertex.col = color_ix,label="id",label.cex=.85,vertex.sides=pch_vec)  
-  else
-    plot(dat$nw, vertex.col = color_ix,vertex.sides=pch_vec)
+  # only show labels on network if the network is small and not in fast edgelist  
+  if(length(which(dat$attr$active ==1))<=100 & !is.null(dat[['nw']])){
+    plot(nw, vertex.col = color_ix,label="id",label.cex=.85,vertex.sides=pch_vec)  
+  } else {
+    plot(nw, vertex.col = color_ix,vertex.sides=pch_vec)
     
     mtext(paste("network at day ",at," (black to yellow: activity grps 1-5)"),side=3)
+  }
  }
 
     

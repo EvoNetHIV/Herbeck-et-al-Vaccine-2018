@@ -18,6 +18,10 @@ social_adherence<-function(dat,at){
     prob<-numeric(length(adh2_ix))
     if(length(ix1)>0){prob[ix1]<- dat$param$aherence_days_high_prob}
     if(length(ix2)>0){prob[ix2]<- dat$param$aherence_days_low_prob}
+    if (dat$param$PrEP_Model == TRUE) { # Don't give drugs to PrEP patients if they have been diagnosed as HIV+
+      diag_HIV_pos <- which(dat$pop$diag_status[adh2_ix] == 1)
+      prob[diag_HIV_pos] <- 0
+    }
     
     dat$pop$Adherence1[adh2_ix]=prob
     dat$pop$Adherence2[adh2_ix]=prob

@@ -18,6 +18,6 @@ plot_age_hist<-function(model)
   hist(out,
        breaks=length(model$param[[1]]$min_age:model$param[[1]]$max_age),
        col="blue",main=NA,xlab="age")
-  title(paste("age distribution at year",yearvec[jj]))
+  mtext(paste("age distribution at year",yearvec[jj]),side=3,line=2.7,col="blue")
   }
 }

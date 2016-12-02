@@ -3,7 +3,7 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
 {
   #description:
   #main argument: type="births" or type="initial"
-  #fills in agent attribute "pop" list; some variales get same value for
+  #fills in agent attribute "pop" list; some variables get same value for
   #initial population and for new additions ("births") while others get
   #different values based on whether its for the initial population or 
   #for new additions. An example is age, ages for initial popn can take a
@@ -22,6 +22,19 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
 
   input_list$id[index] <-  index   
   
+  #Assume new entrants (births) and immigrants aren't treated.
+  input_list$treated[index] <-  rep(0,total_new)  
+  input_list$treated_2nd_line[index] <- rep(0,total_new)
+  
+  #Assume new entrants (births) and immigrants don't have any drug in their system (follows from not being treated)
+  input_list$Drug1[index] <- rep(0,total_new)
+  input_list$Drug2[index] <- rep(0,total_new)
+  input_list$Drug3[index] <- rep(0,total_new)
+  input_list$Drug4[index] <- rep(0,total_new)
+  input_list$OnDrug[index] <- rep(0,total_new)
+  
+  input_list$Aim3RoundingErrors[index] <- rep(0,total_new)
+  
   input_list$Status[index] <-  rep(0,total_new)   
   
   input_list$NumRecipients[index] <-  rep(0,total_new)
@@ -36,6 +49,11 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
  
   input_list$eligible_2nd_line_ART[index] <- rbinom(total_new,1,dat$param$prob_eligible_2nd_line_ART)
   # Later: Make eligibility for 2nd line ART a subset of those eligible for 1st line tx
+  
+  input_list$eligible_vl_test[index] <- rbinom(total_new,1,dat$param$prob_elig_vl_test)
+  
+  # Assign number of consecutive VL tests with VL > 1,000 copies/mL (0 for all new agents)
+  input_list$num_consec_VL_gt1k[index] <- rep(0,total_new)
  
   input_list$total_acts[index] <- rep(0,total_new)
   
@@ -70,13 +88,15 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
     # note: for attributes "sex","att1","role", initial values created in 
     # "setup_nw()" and set on nw, these values then transferred to "pop" list
     
-    # Assign sex
-    input_list$sex[index] <- network::get.vertex.attribute(dat$nw, "sex", unlist = TRUE) 
+ 
+    input_list$sex[index] <- dat$attr$"sex"
+    
+    
     
     # Assign generic nodal attribute values
     if(!is.logical(dat$param$generic_nodal_att_values)){
-      input_list$att1[index] <- network::get.vertex.attribute(dat$nw, "att1", unlist = TRUE)
-      
+      input_list$att1[index] <- dat$attr$"att1"
+
       if(!is.logical(dat$param$sti_prob_att)) {
         att_ix <- lapply(1:dat$param$generic_nodal_att_no_categories, function(x) index[which(input_list$att1 == dat$param$generic_nodal_att_values[x])])
         
@@ -88,7 +108,7 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
     
     # Assign role
     if(!is.logical(dat$param$role_props) && dat$param$model_sex=="msm"){
-      input_list$role[index] <- network::get.vertex.attribute(dat$nw, "role", unlist = TRUE) 
+      input_list$role[index] <- dat$attr$'role'
       
       temp <- index[input_list$role[index]=="I"]
       input_list$insert_quotient[temp] <- 1
@@ -122,10 +142,17 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
                                                        replace = TRUE )
     
     # Assign age
-    input_list$age <- vital_initial_age_dist( 
-                               age.range = dat$param$min_age : (dat$param$max_age-1),
-                               popsize   = dat$param$initial_pop,
-                               age_dist = dat$param$male_age_dist)
+    input_list$age[index_male] <- vital_initial_age_dist( 
+                                  age.range = dat$param$min_age : (dat$param$max_age-1),
+                                  popsize   = length(index_male),
+                                  age_dist = dat$param$male_age_dist)
+    
+    input_list$age[index_female] <- vital_initial_age_dist( 
+                                  age.range = dat$param$min_age : (dat$param$max_age-1),
+                                  popsize   = length(index_female),
+                                  age_dist = dat$param$female_age_dist)
+    
+    
   }
   
   #initial values of these variables differ between initial population
@@ -228,7 +255,6 @@ new_additions_fxn <- function(input_list,dat,index,type=c("births","initial"),at
     input_list$arrival_time[index] <- at
     
   }
-  
   #######################################
   return(input_list)
 }

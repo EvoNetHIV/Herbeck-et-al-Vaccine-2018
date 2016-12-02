@@ -58,6 +58,18 @@ cat("\n----------------------------------")
                default). Using both parameters will set STI status twice, leading to
                unexpected STI prevalence."))
   }
+
+# Warn user and stop simulation if cd4_trt_guidelines_chgs is not in list format.
+  if(length(evonet_params$start_treatment_campaign) > 1 && !is.list(evonet_params$cd4_trt_guidelines_chgs)) {
+    stop(paste("cd4_trt_guidelines_chgs will not work as expected unless it is in list format."))
+  }
+# Warn user and stop simulation if the length of start_treatment_campaign and length of cd4_trt_guidelines_chgs differ
+  if(length(evonet_params$start_treatment_campaign) != length(evonet_params$cd4_trt_guidelines_chgs)) {
+    stop(paste("Length of start_treatment_campaign (length: ", length(evonet_params$start_treatment_campaign),
+               ") must be the same as length of cd4_trt_guidelines_chgs (length: ", length(evonet_params$cd4_trt_guidelines_chgs)),
+         ").")
+  }
+
   #-------------------------------------------------
   #save_vl_list diagnostics
    if(evonet_params$save_vl_list==TRUE){

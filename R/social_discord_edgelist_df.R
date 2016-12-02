@@ -21,7 +21,17 @@ social_discord_edgelist_df <- function(dat,at)
   if(inf_stop || sus_stop){return(dat) }
   
   temp_status_vec <- dat$attr$status_evo
-  discord_edgelist_df <- social_discord_edgelist(nw = dat$nw, 
+  # extract the edgelist from either the nw or attached existing el
+  if(!is.null(dat[['nw']])){
+    el <- get.dyads.active(dat$nw, at = at)
+    # uncomment enforce sort and column order for consistency between fast.edgelist and normal modes
+    #el <- as.edgelist(el,n<-network.size(nw),directed=is.directed(nw),bipartite=is.bipartite(nw),loops=has.loops(nw))
+  } else {
+    el <- dat$el
+    # uncomment enforce sort and column order for consistency between fast.edgelist and normal modes
+    # el <- as.edgelist(el,n=attr(el,'n'),directed=FALSE)
+  }
+  discord_edgelist_df <- social_discord_edgelist(el, 
                                                  status_vec = temp_status_vec,at)
   
   #leave fxn if no disc. pairs

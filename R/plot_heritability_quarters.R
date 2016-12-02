@@ -23,15 +23,16 @@ plot_heritability_quarters<-function(model){
       out <- try({hh <- (lm(ivec ~ dvec))},silent=TRUE)
     
         if(class(out)!="try-error"){
-          plot(dvec,ivec,pch=16,col="blue",cex=.5,xlab="donor spvl",ylab="infectee spvl" )
+          plot(dvec,ivec,pch=16,col="blue",cex=.5,xlab="donor spvl",
+               ylab="infectee spvl" )
           abline(hh,col="red")
-          title(paste(titlevec[ii],"heritability (n=",length(ivec),"):",
-                      format(hh$coefficients[2], digits=2)))
+          mtext(paste(titlevec[ii],"heritability (n=",length(ivec),"):",
+                      format(hh$coefficients[2], digits=2)),side=3,line=2.7,col="blue")
         }
         if(class(out)=="try-error"){
           plot(1:10,1:10,type='n',axes=F)
           box()
-          title(paste(titlevec[ii],"heritability: NA"))
+          mtext(paste(titlevec[ii],"heritability: NA"), side=3,line=2.7,col="blue")
           text(3,5,"Insufficient data")
         }
     }
@@ -39,7 +40,7 @@ plot_heritability_quarters<-function(model){
     if(length(ivec)<5){
       plot(1:10,1:10,type='n',axes=F)
       box()
-      title(paste(titlevec[ii],"heritability: NA"))
+      mtext(paste(titlevec[ii],"heritability: NA"), side=3,line=2.7,col="blue")
       text(3,5,"Insufficient data: n<5")
     }
 

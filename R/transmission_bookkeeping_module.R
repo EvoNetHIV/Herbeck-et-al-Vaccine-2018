@@ -30,9 +30,14 @@ transmission_bookkeeping_module <- function(dat,timeIndex)
   dat$pop$Time_Inf[recipient] <- timeIndex
   dat$pop$V[recipient] <- dat$param$V0
   
+  # If treatment provision is based on "time_dist", assign agent-specific min time to trtmnt
+  if(dat$param$tx_type == "time_dist" | dat$param$tx_type == "cd4_and_time_dist") {
+    dat$pop$min_time_tx[recipient] <- rnorm(length(index), dat$param$mean_time_tx, dat$param$sd_time_tx)
+  }
+  
   #initial infecteds not treated
-  dat$pop$treated[recipient] <- 0
-  dat$pop$treated_2nd_line[recipient] <- 0
+  # dat$pop$treated[recipient] <- 0
+  # dat$pop$treated_2nd_line[recipient] <- 0
   
   #Patient inherits previous patient's virus + mutational deviation
   variance_vals<-rnorm(length(recipient),
@@ -58,7 +63,7 @@ transmission_bookkeeping_module <- function(dat,timeIndex)
   
   dat$pop$SetPoint[recipient] <- "^"(10.0,dat$pop$LogSetPoint[recipient])
 
-  dat$pop$vl_peak_agent[recipient] <-  4.639 + 0.495*dat$pop$LogSetPoint[recipient]
+  dat$pop$vl_peak_agent[recipient] <-  "^"(10.0,4.639 + 0.495*dat$pop$LogSetPoint[recipient])
   
   if(dat$param$vl_peak_agent_flag){
     vl_peak <-dat$pop$vl_peak_agent[recipient] 
@@ -109,17 +114,21 @@ transmission_bookkeeping_module <- function(dat,timeIndex)
     dat$pop$CD4count[recipient] <- 1000
     dat$pop$Imm_Trig[recipient] <- 0
     dat$pop$ChronPhase[recipient] <- 0
-    dat$pop$Drug1[recipient] <- 0  # Big assumption here!!! (Only infected patients get drug!)
-    dat$pop$Drug2[recipient] <- 0  
-    dat$pop$Drug3[recipient] <- 0 
-    dat$pop$Drug4[recipient] <- 0 
+    #dat$pop$Drug1[recipient] <- 0  # Big assumption here!!! (Only infected patients get drug!)
+    #dat$pop$Drug2[recipient] <- 0  
+    #dat$pop$Drug3[recipient] <- 0 
+    #dat$pop$Drug4[recipient] <- 0 
     dat$pop$Aim3RoundingErrors[recipient] <- 0
     ix1<-which(inf_ix==1)
-    v1 <- 1
-    v2 <- c(2,3,4,5,6,7,9,10,11,13, 2+16, 3+16, 5+16, 9+16, 10+16)
-    ix1 <- which(inf_ix %in% v1)
-    ix2 <- which(inf_ix %in% v2)
-    ix3 <- which(!is.element(inf_ix,c(v1,v2)))
+    v0 <- 1
+    v12 <- c(2,3,4,5,6,7,9,10,11,13, 17, 18, 19, 21, 25) 
+    v15 <-  2:32
+    ix1 <- which(inf_ix %in% v0)
+    ix2 <- which(inf_ix %in% v12)
+    ix3 <- which(!is.element(inf_ix,c(v0,v12)))
+    ix15 <- which(inf_ix %in% v15)
+    
+      dat$pop$virus_1_plus_drug_muts[recipient[ix1]] <- 0
     
       dat$pop$virus_sens_drug[recipient[ix1]] <- 1 
       dat$pop$virus_part_res_drug[recipient[ix1]] <- 0

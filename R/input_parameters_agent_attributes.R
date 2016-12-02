@@ -29,9 +29,8 @@ input_parameters_agent_attributes <-function(){
     
     "V_vec",                           "I_vec",
     "M_vec",                           "L_vec",
-    "K",   
+    "K",                               "Imm_Trig", 
     "CD4count",                        "CD4tot",
-    "Imm_Trig", 
     "ChronPhase",                      "OnDrug",
     "Adherence1","Adherence2",         "Adherence3","Adherence4",
     "Drug1", "Drug2",                  "Drug3", "Drug4", 
@@ -44,7 +43,8 @@ input_parameters_agent_attributes <-function(){
     "CD4_time_cat4",                    "CD4_nadir",
     "virus_sens_vacc",                  "virus_sens_drug",
     "virus_part_res_drug",              "virus_3_plus_drug_muts",
-    "Aim3RoundingErrors",               "aim3_mutations_long",
+    "virus_3_plus_drug_muts",             "Aim3RoundingErrors",               
+     "aim3_mutations_long",
     
 # -- testing for and treatment of drug resistant viruses (aim 3) --- #    
     "eligible_2nd_line_ART",
@@ -60,12 +60,13 @@ input_parameters_agent_attributes <-function(){
     "last_neg_test",                   "diag_status",
     "diag_time",                       "disclosure_status",
     "id",                              "eligible_care",
-    "att1",
+    "att1",                            "AI_prob",
     "treated",                         "tx_init_time",
     "circum",                           "tx_schedule",               
     "sti_status",                       "sex",
     "viral_lineage",                    "viral_lineage_init_SPVL",
-    "total_acts",                        "role")
+    "total_acts",                        "role",
+    "min_time_tx")
     
     ##############################
   ) #end of  list

@@ -14,11 +14,14 @@ vital_births_bookkeeping_misc <- function(dat,at){
 nBirths<- length(which(dat$pop$arrival_time==at))  
 #-----------------------------------------------
 #add new nodes/vertices and activate them (epimodel) 
-n        <- network.size(dat$nw)
-dat$nw   <- add.vertices(dat$nw, nv = nBirths)
+if(!is.null(dat[['nw']])){
+  n <- network.size(dat$nw)
+} else {
+  n <- attr(dat$el,'n')
+}
 newNodes <- (n + 1):(n + nBirths)
-dat$nw   <- activate.vertices( dat$nw, onset= at, 
-                               terminus= Inf,v= newNodes ) 
+dat <- EpiModel:::initiate_vertices(dat,at,nBirths)
+
 #-----------------------------------------------
 
 dat$attr$status_evo <- c(dat$attr$status_evo,  rep(0,nBirths))
@@ -29,46 +32,60 @@ dat$attr$exitTime   <- c(dat$attr$exitTime, rep(NA_real_, nBirths ) )
 dat$attr$infTime    <- c(dat$attr$infTime,  rep(NA_real_, nBirths ) )
 #-----------------------------------------------
 
-#setting nw attributes for "id","role","att1","sex"
-#note: values for these attributes created in "vital_new_additions()" in "births" section
-#which is called in "vital_births_bookkeeping"
+# setting nw attributes for "id","role","att1","sex"
+# note: values for these attributes created in "vital_new_additions()" in "births" section
+# which is called in "vital_births_bookkeeping"
 
-#indices (and IDs) for new agents on "pop" list
+# attributes will only be attached to the network object if it exists, otherwise just in dat$attr
+
+# indices (and IDs) for new agents on "pop" list
 temp_ix     <- (length(dat$pop$Status)-nBirths+1) : length(dat$pop$Status)
 
 
-if(dat$param$model_sex!="msm"){
-dat$attr$sex  <- c(dat$attr$sex,dat$pop$sex[temp_ix]) 
-set.vertex.attribute(x = dat$nw, 
-                     attr = "sex",
-                     value = dat$pop$sex[temp_ix],
-                     v = newNodes)  
+
+dat$attr$sex  <- c(dat$attr$sex,dat$pop$sex[temp_ix])
+if(!is.null(dat[['nw']])){
+  set.vertex.attribute(x = dat$nw, 
+                       attr = "sex",
+                       value = dat$pop$sex[temp_ix],
+                       v = newNodes)
 }
 
 
 #"id" is for qaqc (to match id on network to id on "pop")
 #and is always set
 dat$attr$id  <- c(dat$attr$id,dat$pop$id[temp_ix])
-
-network::set.vertex.attribute(x = dat$nw, attr = "id",
+if(!is.null(dat[['nw']])){
+  network::set.vertex.attribute(x = dat$nw, attr = "id",
                               value = temp_ix, v = newNodes)
+}
 
 if(!is.logical(dat$param$generic_nodal_att_values)){  
   dat$attr$att1  <- c(dat$attr$att1,dat$pop$att1[temp_ix])
-  set.vertex.attribute(x = dat$nw, 
-                       attr = "att1",
-                       value = dat$pop$att1[temp_ix],
-                       v = newNodes)  
+  if(!is.null(dat[['nw']])){
+    set.vertex.attribute(x = dat$nw, 
+                         attr = "att1",
+                         value = dat$pop$att1[temp_ix],
+                         v = newNodes)
+  }
 }
 
 if(!is.logical(dat$param$role_props) && dat$param$model_sex=="msm"){  
-  dat$attr$role  <- c(dat$attr$role,dat$pop$role[temp_ix]) 
-  set.vertex.attribute( x     = dat$nw, 
-                        attr  = "role",
-                        value = dat$pop$role[temp_ix],
-                        v     = newNodes )  
+  dat$attr$role  <- c(dat$attr$role,dat$pop$role[temp_ix])
+  if(!is.null(dat[['nw']])){
+    set.vertex.attribute( x     = dat$nw, 
+                          attr  = "role",
+                          value = dat$pop$role[temp_ix],
+                          v     = newNodes )
+  }
 }
 #-----------------------------------------------
+# consistency check that all of dat$attr are the same length
+if(length(unique(sapply(dat$attr,length)))>1){
+  browser()
+  stop('inconsistent lengths of dat$attr, check bookeeping code')
+}
+
 
 return(dat)
 }

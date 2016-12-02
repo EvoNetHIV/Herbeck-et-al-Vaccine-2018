@@ -29,6 +29,7 @@ initialize_agents <- function(dat,at)
   pop$M_vec <- matrix(0,nrow=dat$param$initial_pop, ncol=V_vec_length)
   pop$L_vec <- matrix(0,nrow=dat$param$initial_pop, ncol=V_vec_length)
   
+   
   #assigns "pop" object to main "dat" epimodel data structure
   dat$pop <- pop  
   

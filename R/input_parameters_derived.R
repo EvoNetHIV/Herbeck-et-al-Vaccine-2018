@@ -16,12 +16,18 @@ derived_params <- list(
   h     = sqrt(initial_param$Heritability),
   r0    = (log(initial_param$vl_peak_acute / initial_param$V0) /
               initial_param$t_peak),
+  
   pop_growth_rate_timestep  = utilities_annual_prob_conversion(
                                     initial_param$pop_growth_rate_annual,
                                     365),
+  
   male_age_dist = input_parameters_age_distribution(
-              data_name="usa_men_18_to_100",
+              data_name=initial_param$initial_agedata_male,
               initial_param$min_age,initial_param$max_age),
+  
+  female_age_dist = input_parameters_age_distribution(
+             data_name=initial_param$initial_agedata_female,
+             initial_param$min_age,initial_param$max_age),
   
   mort_per_timestep_male = input_parameters_asmr(
               data_name=initial_param$asmr_data_male ,

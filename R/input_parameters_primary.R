@@ -18,6 +18,7 @@ input_parameters_primary<-function(){
     start_timestep = 1, #parameter for EpiModel, should be "1" if new simulation
                         #if re-starting simulation,
                         #value should be "n_steps+1" (n_steps from original sim.)
+    fast_edgelist = FALSE,
     nsims        = 1,
     initial_pop  = 100, #initial popn
     n_steps      = 365*2,
@@ -210,9 +211,12 @@ input_parameters_primary<-function(){
     RestartDrug4 = 1000000000.0, # Drug 3 becomes available once again 
 
 # -- Parameters related to viral load testing
-    testing_model            = "interval",
-    mean_test_interval_male  = 365,
-    mean_test_interval_female = 442,
+    prob_elig_vl_test         = 0.75,
+    time_on_tx_for_vl_testing = 365/2,
+    vl_testing_interval       = 365/2,
+
+# -- Parameters related to PrEP / Vaccine models that use alleles to model resistance
+    PrEP_Model = FALSE,
 
 # -- Parameters related to drug resistance testing and start of 2nd line therapy (aim 3 only)
     resist_testing_model = "interval",
@@ -229,6 +233,8 @@ input_parameters_primary<-function(){
     prop_new_agents_min_age   = 0.45, #for "mixed" see above line
     asmr_data_male            = "usa_men_18_to_100",#other option: "south_africa_male"
     asmr_data_female          = "south_africa_female",
+    initial_agedata_male      = "usa_men_18_to_100", #other option:"south_africa_male_16_to_100"
+    initial_agedata_female    = "south_africa_female_16_to_100",
     aids_death_model         = "cd4",        # c("Gamma_Death","daily_prob","cd4")
     death_rate_constant      = 0.000003,   	 # 0.000003 is from CASCADE
     death_rate_exponent      = 6.45,         # 6.45 is from CASCADE
@@ -249,17 +255,25 @@ input_parameters_primary<-function(){
 
 #-- social / treatment /testing  parameters -------------#
 
+    testing_model            = "interval",
+    mean_test_interval_male  = 365,
+    mean_test_interval_female = 442,
+    mean_trtmnt_delay = 1,
+    mean_time_tx = 0, # used when tx_type = "time_dist"
+    sd_time_tx = 0, # used when tx_type = "time_dist"
     start_treatment_campaign = 5e5,
     start_vacc_campaign      = 5e5,
     prob_care                = 1.0,
     prob_eligible_ART        = 1.0,
     prob_eligible_2nd_line_ART = 1.0,
+    second_line_elig         = "vl_only",
     perc_vaccinated          = 0.5,
     vacc_eff_duration        =  365*3,
     tx_in_acute_phase        = FALSE,
     tx_schedule_props        =c("F"=1,"V"=0,"N"=0,"P"=0),
     treatment_threshold      = 1e4,     #VL raw,not log10 transformed
     cd4_treatment_threshold  = 0,
+    cd4_trt_guidelines_chgs  = NA, # Default for SA eligibility changes: list(4, 3:4, 2:4, 1:4)
     attr_treatment_threshold  = 5,  # Under development.  When finished, this parameter will
                                     # allow one to target therapy to attribute groups
                                     # "attr_treatment_threshold" and higher (e.g. target therapy

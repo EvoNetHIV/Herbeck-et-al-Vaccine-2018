@@ -15,6 +15,25 @@ initialize_module <- function(x, param, init, control, s)
   
   #sets up basic EpiModel structure
   dat  <-  EpiModel::initialize.net(x, param, init, control,s)
+  
+  # need to ensure that sex attribute as been copied to dat$attr from the network.
+  #  ideally for consistency we'd like to have all of the attributes 
+  # included on the dat$attr list.  However, when in network mode, only the 
+  # attributes included in the formula (usually 'role') will be coppied
+  # so need to force copy it here until we figure a better system.  
+  if(is.null(dat$attr[['sex']]) & !is.null(dat[['nw']])){
+    dat$attr$sex <- get.vertex.attribute(dat$nw,'sex')
+  }
+  # likewise, if there is going to be roles in the model, need to ensure they are copied in
+  if(dat$param$model_sex=="msm" && 
+     (is.null(dat$attr[['role']]) & !is.null(dat[['nw']]))){
+    dat$attr$role <- get.vertex.attribute(dat$nw,'role')
+  }
+  
+  #if(is.null(dat$attr[['role']]) & !is.null(dat[['nw']])){
+  #  dat$attr$role <- get.vertex.attribute(dat$nw,'role')
+  #}
+  
   #sets up agent attributes and initial values 
   dat  <-  initialize_agents(dat, 1)
   #fills in vl variable values for initial infecteds

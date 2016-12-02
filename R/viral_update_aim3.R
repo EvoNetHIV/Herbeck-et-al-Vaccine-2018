@@ -14,9 +14,14 @@ viral_update_aim3 <-function(dat,at)
 
   
   timeIndex          <- at
-  List_HIV_Infected  <- which(dat$pop$Status==1)
+    
+  if (dat$param$PrEP_Model) {
+    List_Simulated_Agents  <- which(dat$pop$Status>=0)
+  } else {
+    List_Simulated_Agents <- which(dat$pop$Status==1)
+  }
 
-  for (ind in List_HIV_Infected) 
+  for (ind in List_Simulated_Agents) 
    {
   
     # list_1 gives parameters.  list_2 gives variables

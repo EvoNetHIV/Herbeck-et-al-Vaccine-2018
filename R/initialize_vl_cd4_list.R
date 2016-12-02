@@ -6,7 +6,7 @@ initialize_vl_cd4_list <- function(dat,at)
 if(dat$param$save_vl_list){
   dat$vl_list<-vector('list',length=dat$param$n_steps)
   #populate vl/cd4 list for timestep 1
-  vl_ix <- which(dat$pop$Status==1)
+  vl_ix <- which(dat$pop$Status>=0)
   # Define new sequences to identify viruses with 0, 1, 2, 3, or 4 mutations  
   seq0 <- c(1) #0  mutations
   seq1 <- c(2,3,5,9,17) #1 mutations

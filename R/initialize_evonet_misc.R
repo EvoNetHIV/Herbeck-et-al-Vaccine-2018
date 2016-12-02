@@ -60,7 +60,11 @@ initialize_evonet_misc <- function(dat)
   #---
   #attach fxns to calculte population statistics to "dat" object
   #and plotting methods; see "summary_popsumm_fxns"
-  popsumm_fxns <- summary_popsumm_fxns(generic_nodal_att_values=dat$param$generic_nodal_att_values)
+  
+ #if not aim3 run, then aim3 stats/figures not produced
+ if(dat$param$VL_Function=="aim3"){aim3=T}else{aim3=F}
+ if(dat$param$fast_edgelist==TRUE){fast_el=T}else{fast_el=F}
+  popsumm_fxns <- summary_popsumm_fxns(generic_nodal_att_values=dat$param$generic_nodal_att_values,aim3=aim3,fast_el=fast_el)
   dat$popsumm_fxns <- lapply(1:length(popsumm_fxns),function(x) popsumm_fxns[[x]]$model_value_fxn)
   names(dat$popsumm_fxns)<- names(popsumm_fxns)
   
@@ -77,7 +81,8 @@ initialize_evonet_misc <- function(dat)
   else
     popsumm_length <- (dat$param$n_steps/dat$param$popsumm_frequency)+1
   
-  dat$popsumm        <- lapply(dat$popsumm,function(x){ rep(NA_real_,times=popsumm_length)})
+   dat$popsumm        <- lapply(dat$popsumm,function(x){ rep(NA_real_,times=popsumm_length)})
+ # dat$popsumm        <- lapply(dat$popsumm,function(x){ rep(0,times=popsumm_length)})
   names(dat$popsumm) <- popsumm_vars
   #-----------------------------
   #create age list for plotting age distributions during model

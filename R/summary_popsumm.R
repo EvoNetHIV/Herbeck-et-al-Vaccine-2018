@@ -48,8 +48,11 @@ summary_popsumm<-function(dat,at){
                                                          dat$pop$virus_sens_drug==1))
   new_infections_virus_drug_part_res_count <- length(which(is.element(dat$pop$Time_Inf, time_index)&
                                                          dat$pop$virus_part_res_drug==1))
-  new_infections_virus_drug_3_plus_res_count <- length(which(is.element(dat$pop$Time_Inf, time_index)&
+  new_infections_virus_drug_3_plus_res_count <- length(which(is.element(dat$pop$Time_Inf, time_index) &
                                                          dat$pop$virus_3_plus_drug_muts==1))
+  new_infections_virus_1_drug_muts <- length(which(is.element(dat$pop$Time_Inf, time_index) &
+                                                             dat$pop$virus_3_plus_drug_muts==1))
+  
   
   donor_time_inf  <- ifelse(new_infections_count>0,
                             dat$pop$Donors_Total_Time_Inf_At_Trans[new_infections],
@@ -75,16 +78,36 @@ summary_popsumm<-function(dat,at){
   
 #browser()
   #network statistics
-  nw_summary    <-  summary(dat$nw~degree(0:1) + concurrent, at = at)
-  number_edges <- unname(summary(dat$nw~edges,at=at)[1,1])
-  network_size <- network.size(dat$nw)
-  total_nodes   <-  sum(nw_summary[1,1]+nw_summary[1,2]+nw_summary[1,3])
-  
+  # some of these can't be computed if we are in edgelist mode
+  # so need to create a network from the edgelist
+  if(!is.null(dat[['nw']])){
+    nw <- dat[['nw']]
+  } else {
+    nw_summary    <-  NULL 
+    number_edges <- nrow(dat$el) 
+ 	  network_size <- attr(dat$el,'n') 
+    total_nodes   <-  NULL 
+    netattrs<-attributes(dat$el)
+    nw <- as.network.matrix(dat$el, matrix.type='edgelist',
+                            # TODO: ASSUMING THESE HAVE BEEN HARDCODED UPSTREAM
+                            directed = FALSE,
+                            bipartite = FALSE,
+                            loops = FALSE
+                            )
+  }
+  nw_summary    <-  summary(nw~degree(0:1) + concurrent, at = at)
+  number_edges <- network.edgecount(nw)
+  network_size <- network.size(nw)
+  total_nodes   <-  sum(nw_summary[1]+nw_summary[2]+nw_summary[3]) # This depends on nw_summary which I blanked out above
+    
+ 
   #viral load values
   log10_vl_values  <-  log10(dat$pop$V[which(inf_index)]+dat$param$AbsoluteCut)
   spvl_untreated_values <- (
         dat$pop$LogSetPoint[which(inf_index & not_treated_index)])
-  edges_by_agent <- unname(summary(dat$nw ~ sociality(base = 0),at=at)[1,]) #use dat$attr$id for index on dat$pop
+  # todo: may be a faster way to calculate degree
+  
+  edges_by_agent <- unname(summary(nw ~ sociality(base = 0),at=at)) #use dat$attr$id for index on dat$pop
   edges_untreated <- edges_by_agent[dat$attr$id %in% not_treated_agents ]
   edges_treated <- edges_by_agent[dat$attr$id %in%  treated_agents]
 
@@ -103,21 +126,21 @@ summary_popsumm<-function(dat,at){
   mutations3exact <- length(which(inf_undetect_ix & dat$pop$aim3_no_muts==3))
   mutations4exact <- length(which(inf_undetect_ix & dat$pop$aim3_no_muts==4))
   
-  mutations3plus_long <- length(which(inf_index & dat$pop$aim3_mutations_long>=3))
-  mutations4plus_long <- length(which(inf_index & dat$pop$aim3_mutations_long>=4))
-  mutations5_long <- length(which(inf_index & dat$pop$aim3_mutations_long==5))
+  mutations3plus_long <- length(which(inf_index & dat$pop$aim3_muations_long>=3)) 
+  mutations4plus_long <- length(which(inf_index & dat$pop$aim3_muations_long>=4)) 
+  mutations5_long <- length(which(inf_index & dat$pop$aim3_muations_long==5)) 
   
   #coital acts
   
   if(!is.null(dat$discord_coital_df)){
-  number_coit_acts <- sum(tapply(dat$discord_coital_df$act_id_couple,
-                          dat$discord_coital_df$couple_id,
-                          max))
-  acts_iev <- length(which(dat$discord_coital_df$iev==1))/2
-  percent_iev <-  (acts_iev / number_coit_acts)
-  transmission_opps_condom_percent <- (length(which(dat$discord_coital_df$condom==1)) / 
-                                 nrow(dat$discord_coital_df) )
-   trans_probs_mean <- mean(dat$discord_coital_df$trans_probs)
+    number_coit_acts <- sum(tapply(dat$discord_coital_df$act_id_couple,
+                            dat$discord_coital_df$couple_id,
+                            max))
+    acts_iev <- length(which(dat$discord_coital_df$iev==1))/2
+    percent_iev <-  (acts_iev / number_coit_acts)
+    transmission_opps_condom_percent <- (length(which(dat$discord_coital_df$condom==1)) / 
+                                   nrow(dat$discord_coital_df) )
+     trans_probs_mean <- mean(dat$discord_coital_df$trans_probs)
    
   }else{
     number_coit_acts <- 0

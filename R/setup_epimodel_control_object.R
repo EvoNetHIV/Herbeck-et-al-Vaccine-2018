@@ -12,17 +12,19 @@ setup_epimodel_control_object <- function(evonet_params,module_list)
   #input: evoparams "save_network","nsims","n_steps"
   #output: EpiModel "control" object (used in EpiModel netsim fxn)
   
-  control_epimodel_params_list <- list(ncores=evoparams$ncores,
+  control_epimodel_params_list <- list(ncores=evonet_params$ncores,
                                        type   = "SI",
                                        nsims  = evonet_params$nsims,
                                        nsteps = evonet_params$n_steps,  #set in parameter_list.R
                                         start  = evonet_params$start_timestep,
                                        depend = TRUE,
+                                       use.pids = FALSE,
                                        tea.status    = FALSE,
                                        save.transmat = FALSE,
                                        save.nwstats  = FALSE,
                                        save.network  = evonet_params$save_network,
                                        delete.nodes  = !evonet_params$save_network,
+                                       fast.edgelist = evonet_params$fast_edgelist,
                                        module.order  = names(module_list)[-c(1,length(names(module_list)))],
                                        save.other    = c("attr","pop","param","nw","coital_acts_list",
                                                          "popsumm","vl_list","InfMat","age_list",

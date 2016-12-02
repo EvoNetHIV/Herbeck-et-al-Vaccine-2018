@@ -23,7 +23,8 @@ for(tt in 1:length(model_paths))
   load(model_paths[tt])
   model=NULL
   model=get(model_names[tt])
-  plot_fxns <- summary_popsumm_fxns(model$param[[1]]$generic_nodal_att_values)
+  fast_el <- model$param[[1]]$fast_edgelist
+  plot_fxns <- summary_popsumm_fxns(model$param[[1]]$generic_nodal_att_values,fast_el)
   
     data <- model$popsumm
   popsumm_frequency=model$param[[1]]$popsumm_frequency

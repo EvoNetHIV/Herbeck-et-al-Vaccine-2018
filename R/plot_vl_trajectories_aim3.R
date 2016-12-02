@@ -67,7 +67,8 @@ plot_vl_trajectories_aim3<- function(model,sim,Therapy_Type,outpath,name)
       lines(vl_df[vl_ix,5],log10(vl_df[vl_ix,23]),lwd=2,col="gray")    
       lines(vl_df[vl_ix,5],log10(vl_df[vl_ix,24]),lwd=2,col="orange")    
       
-      mtext(paste("Blue=K65R(TDF), Red=M184V(3TC), Green=K103(EFV), Orange= GenEFV\n,Grey = Generic TDF,DarkGreen = K103N/gEFV (EFV+), Purple = M184V/K65R (TDF+, 3TC+)"),side=3)       
+      #mtext(paste("Blue=K65R(TDF), Red=M184V(3TC), Green=K103(EFV), Orange= GenEFV\n,Grey = Generic TDF,DarkGreen = K103N/gEFV (EFV+), Purple = M184V/K65R (TDF+, 3TC+)"),side=3)       
+      mtext(paste("Blue=Mut1, Red=Mut2, Green=Mut3, Orange= Mut4\n,Grey = Mut5, Purple = Muts1and2, DarkGreen = Muts3and4"),side=3)       
       
       #---------------------------------
       #drug concentration plot for same agent
@@ -75,8 +76,9 @@ plot_vl_trajectories_aim3<- function(model,sim,Therapy_Type,outpath,name)
                   as.numeric(vl_df[vl_ix,13]),
                   as.numeric(vl_df[vl_ix,14]))
       make_dummy_graph <- FALSE
-      if(all(is.na(tempvec))){make_dummy_graph <- TRUE}
-      if(all(tempvec==0)){make_dummy_graph <- TRUE}
+      if(any(is.na(tempvec))){make_dummy_graph <- TRUE} else {
+        if(all(tempvec==0)){make_dummy_graph <- TRUE}
+      }
       if (make_dummy_graph == FALSE) {
         #mindrug=(min(tempvec,na.rm=T))
         mindrug=-4.5
@@ -100,10 +102,10 @@ plot_vl_trajectories_aim3<- function(model,sim,Therapy_Type,outpath,name)
           ad3 = ad1  #  (i.e., ignore Adhernce2 and Adherence3)
         }
         templab=paste("Agent ",ind,
-                      ": [Drug] (Adherence):\n Blue=TDF(",ad1,")",
-                      "Red=3TC(",ad2,")", 
-                      "Gr=EFV(",ad3,")" ,
-                      "Blck=2nd(",ad4,")",sep="")
+                      ": [Drug] (Adherence):\n Blue=Drug1(",ad1,")",
+                      "Red=Drug2(",ad2,")", 
+                      "Gr=Drug3(",ad3,")" ,
+                      "Blck=Drug4(",ad4,")",sep="")
         mtext(templab,side=3)
       } else { # Remake part of first graph so all patient agent graphs remain on one page
           seq1<- seq(1,model$param[[sim]]$n_steps,length=10)

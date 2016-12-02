@@ -27,8 +27,12 @@ social_attribute_transition_module <- function(dat,at){
   temp_match<- match(dat$attr$id,dat$pop$id)
   #qaqc for now (10/8/15)
   if(any(is.na(temp_match))){browser()}
-  network::set.vertex.attribute( x = dat$nw, attr = "role",
-                                 value = dat$pop$role[temp_match])
+  if(!is.null(dat[['nw']])){
+      network::set.vertex.attribute( x = dat$nw, attr = "role",
+                                   value = dat$pop$role[temp_match])
+    }
+    # update the version of the attribute in dat$attr as well
+    dat$attr$role <- dat$pop$role[temp_match]
   }
   #-- end of role updates --------------------
   

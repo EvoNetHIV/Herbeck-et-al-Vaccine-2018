@@ -11,13 +11,16 @@ if(at==1){
 }else{
   if(!dat$param$save_vl_list){return(dat)}
 }
-
-  
-vl_ix <- which(dat$pop$Status==1 | (dat$pop$Status==-2 & dat$pop$Time_Death==at))
+              
+if (dat$param$PrEP_Model==TRUE) {  
+  vl_ix <- which(dat$pop$Status>=0 | (dat$pop$Status==-2 & dat$pop$Time_Death==at))
+} else {
+  vl_ix <- which(dat$pop$Status>=1 | (dat$pop$Status==-2 & dat$pop$Time_Death==at))
+}
 if(length(vl_ix)==0){return(dat)}
   
 namesvec<-c("id","vl","cd4","cd4c","time","muts0","muts1","muts2","muts3","muts4","muts5","drug1","drug2",
-            "drug3","I","M","L","K65R","M184V","K103N","K103NgEFV","M184VK65R","gTDF","gEFV","drug4")
+            "drug3","I","M","L","Mut1","Mut2","Mut3","Muts35","Muts12","Mut4","Mut5","drug4")
 
 
 # Define new sequences to identify viruses with 0, 1, 2, 3, or 4 mutations  

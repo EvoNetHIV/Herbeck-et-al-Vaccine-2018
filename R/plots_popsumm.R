@@ -34,13 +34,14 @@ plots_popsumm_all_NA_flag <- function(variable,popsumm){
 plots_popsumm_all_NA_plot<-function(variable){
   plot(1:10,1:10,ylab=NA,xlab=NA,type='n',axes=F)
   box()
-  mtext("All values NA or zero or some -Inf",side=3,line=-4)
+  mtext("All values NA or zero",side=3,line=-4)
   mtext(variable,side=3,line=1)
 }
 
 #--------------------------------
 #' @export
-plots_popsumm_overlay_lines<-function(nsims,over_var,params,popsumm,popsumm_freq){
+plots_popsumm_overlay_lines<-function(nsims,over_var,params,popsumm,popsumm_freq,
+                                      cumul=F,color1="firebrick1",color2="red3"){
   #browser()
   temp_list <- vector('list',length=nsims) 
   for(kk in 1:nsims){
@@ -49,19 +50,23 @@ plots_popsumm_overlay_lines<-function(nsims,over_var,params,popsumm,popsumm_freq
       xvector <- (1:params$n_steps)/365
     else
       xvector <- c(1,seq(popsumm_freq,params$n_steps,by=popsumm_freq))/365
+    if(cumul==T){yvector=cumsum(popsumm[[kk]][[over_var]])
+    }else{yvector=popsumm[[kk]][[over_var]]}
     
     if(nsims==1){lty_type=1}else{lty_type=2}
-     lines(xvector,popsumm[[kk]][[over_var]],
-           col="firebrick1",lty=lty_type)
-    temp_list[[kk]]<-popsumm[[kk]][[over_var]]
+     lines(xvector,yvector,
+           col=color1,lty=lty_type)
+    temp_list[[kk]]<-yvector
     
   }
    if(nsims>1){
    temp_mat=do.call(rbind,temp_list)
    temp_means=colMeans(temp_mat,na.rm=T)
-   lines((xvector),temp_means,lwd=2,col="red3")
+   lines((xvector),temp_means,lwd=2,col=color2)
    }
-  mtext(paste("with",over_var,"overlay"),side=3,line=.5,cex=.65)
+  if(color2=="red3"){
+    mtext(paste(over_var),side=3,line=1.5,cex=.9,col=color1)
+  }else{mtext(paste(over_var),side=3,line=.15,cex=.9,col=color1)}
 }
 
 #--------------------------------
@@ -92,7 +97,7 @@ plots_popsumm_mean_value_loess<-function(datlist,xvector,variable){
 #--------------------------------
 #' @export
 plots_popsumm_plotting<-function(variable,plot_type,nsim,popsumm,xvector,min_max,
-                                 loessvec,max_pts_rep){
+                                 loessvec,max_pts_rep,descript=NULL){
   #if(variable=="natural_deaths"){browser()}
  if(plot_type=="line_raw"){
      yy=popsumm[[nsim]][[variable]]
@@ -111,7 +116,7 @@ plots_popsumm_plotting<-function(variable,plot_type,nsim,popsumm,xvector,min_max
  if(plot_type!="points")
  {
    parlist=list(x=xvector,y=yy,type=type,xlab="years",ylab="",col="blue",
-                main=variable,ylim=c(min_max["ymin"],min_max["ymax"]),lty=2)
+                main="",ylim=c(min_max["ymin"],min_max["ymax"]),lty=2)
  }
   
   if(plot_type=="points")
@@ -127,14 +132,19 @@ plots_popsumm_plotting<-function(variable,plot_type,nsim,popsumm,xvector,min_max
     if(all(is.na(yy))){return(invisible(NULL))}
     
     parlist=list(x=xvector[sampvec],y=yy[sampvec],type=type,xlab="years",ylab="",col=nsim,
-                 main=variable,ylim=c(min_max["ymin"],min_max["ymax"]),
+                 main="",ylim=c(min_max["ymin"],min_max["ymax"]),
                  xlim=c(1/365,xvector[length(xvector)]),pch=1)
   }
   
  
  if(nsim==1)do.call(plot,parlist)
  if(nsim>1)do.call(lines,parlist)
-    
+  
+  if(nsim==1){  
+  mtext(paste(variable),line=2.7,side=3,cex=.9,col="blue")
+  mtext(paste(descript),line=1.5,side=3,cex=.7,col="blue")
+  }
+  
  if(variable %in% loessvec){
    navec<- is.na(yy)
    if(any(navec)){
@@ -166,8 +176,9 @@ plots_popsumm_internal<-function(model,outpath,name,
   }
   
   par(mfrow=c(3,2),mgp=c(2.5,1,0))
-
-  plot_fxns <- summary_popsumm_fxns(model$param[[1]]$generic_nodal_att_values)
+  if(model$param[[1]]$VL_Function=="aim3"){aim3=T}else{aim3=F}
+  if(model$param[[1]]$fast_edgelist==TRUE){fast_el=T}else{fast_el=F}
+  plot_fxns <- summary_popsumm_fxns(model$param[[1]]$generic_nodal_att_values,aim3,fast_el)
 
   data <- model$popsumm
   vars <- names(model$popsumm[[1]])
@@ -175,8 +186,10 @@ plots_popsumm_internal<-function(model,outpath,name,
   plot_type_vec <- unlist(plot_type_vec)
   loess_vec  <- names(unlist(lapply(plot_fxns,function(x) x$loess)))
   overlay_vec <- unlist(lapply(plot_fxns,function(x) x$overlay))
+  overlay_vec2 <- unlist(lapply(plot_fxns,function(x) x$overlay2))
   ymin_vec<- names(unlist(lapply(plot_fxns,function(x) x$ymin)))
-    
+  description<- unname((unlist(lapply(plot_fxns,function(x) x$description))))
+  
   nsims<-length(data)
   
   if(popsumm_frequency==1)
@@ -201,6 +214,11 @@ plots_popsumm_internal<-function(model,outpath,name,
    if(vars[ii]=="Perc_3_drug_muts"){next}
    if(vars[ii]=="Perc_4_drug_muts"){next}
    if(vars[ii]=="no_treated_undetectable"){next}    
+   if(vars[ii]== "total_1+_drug_muts"){next}
+   if(vars[ii]== "total_3+_drug_muts"){next}
+    if(vars[ii]== "drug_muts_1+"){next}
+    if(vars[ii]== "drug_muts_3+"){next}
+    
     
    if(ii==12){
      plot_time_to_removal(model,"aids")
@@ -233,7 +251,7 @@ plots_popsumm_internal<-function(model,outpath,name,
     for(jj in 1:length(data)){
         yy<- plots_popsumm_plotting(vars[ii],plot_type_vec[ii],nsim=jj,
                                model$popsumm,xx,ymin_ymax,loess_vec,
-                               max_points_rep)
+                               max_points_rep,descript=description[ii])
       data_list[[jj]]<- yy
       
         
@@ -243,6 +261,12 @@ plots_popsumm_internal<-function(model,outpath,name,
       index <- which(names(overlay_vec)==vars[ii])
       plots_popsumm_overlay_lines(length(data),overlay_vec[index],model$param[[1]],
                                   model$popsumm,popsumm_frequency)
+    }
+    
+    if(vars[ii] %in% names(overlay_vec2)){
+      index <- which(names(overlay_vec2)==vars[ii])
+      plots_popsumm_overlay_lines(length(data),overlay_vec2[index],model$param[[1]],
+                                  model$popsumm,popsumm_frequency,color1="green",color2="darkgreen")
     }
     
     if(!(vars[ii] %in% loess_vec)){

@@ -19,6 +19,12 @@ initialize_infecteds_vl <- function(dat,at)
   # ind represents infected individuals of initial population
   ind <- which(dat$attr$status=="i")
   
+  # If using "time_dist" tx_type, assign a distribution of treatment initiation delay times
+  # to infected agents.
+  if(param$tx_type == "time_dist" | param$tx_type == "cd4_and_time_dist") {
+    pop$min_time_tx[ind] <- rnorm(length(ind), param$mean_time_tx, param$sd_time_tx)
+  }
+  
   #initial infecteds not treated
   pop$treated[ind] <- 0
   pop$treated_2nd_line[ind] <- 0
@@ -53,7 +59,7 @@ initialize_infecteds_vl <- function(dat,at)
   #final spvl values
   pop$LogSetPoint[ind] <- temp_spvl
   pop$SetPoint[ind] <- "^"(10.0,pop$LogSetPoint[ind])
-  pop$vl_peak_agent[ind] <- 4.639 + 0.495*pop$LogSetPoint[ind]
+  pop$vl_peak_agent[ind] <- 10^(4.639 + 0.495*pop$LogSetPoint[ind])
   if(param$vl_peak_agent_flag){
     vl_peak <-pop$vl_peak_agent[ind] 
   }else{

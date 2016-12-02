@@ -43,10 +43,9 @@ vital_death_non_aids <- function(dat,at)
     dat$pop$Time_Death[active_evo][nat_deaths] <- at
     
     #modify network
-    dat$nw <- deactivate.vertices(dat$nw,  onset = at,
-                                  terminus = Inf,
-                                  v  = active[nat_deaths],
-                                  deactivate.edges = TRUE)
+    dat <- EpiModel:::terminate_vertices(dat = dat,
+                                         at = at,
+                                         vids.to.terminate = active[nat_deaths])
     
     #end of bookkeeeping if natural deaths occur
   }

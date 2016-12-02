@@ -31,10 +31,10 @@ social_generic_attribute_transition <- function(dat,at)
   temp_match<- match(dat$attr$id,dat$pop$id)
   #qaqc for now (10/8/15)
   if(any(is.na(temp_match))){browser()}
-  
-  network::set.vertex.attribute( x = dat$nw, attr = "att1",
-                                 value = dat$pop$att1[temp_match])
-
+  if(!is.null(dat[['nw']])){
+    network::set.vertex.attribute( x = dat$nw, attr = "att1",
+                                   value = dat$pop$att1[temp_match])
+  }
   dat$attr$att1 <- dat$pop$att1[temp_match]
   return(dat)
 }

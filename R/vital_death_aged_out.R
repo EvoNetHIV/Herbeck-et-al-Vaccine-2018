@@ -13,7 +13,7 @@ vital_death_aged_out <- function(dat,at)
   
   ages <- dat$pop$age[active_evo]
   aged_out_index <- which(ages>=dat$param$max_age)
-  
+  if(length(aged_out_index) > 0){
     #bookkeeping
     dat$pop$treated[active_evo][aged_out_index] <- 0
     dat$pop$treated_2nd_line[active_evo][aged_out_index] <- 0
@@ -22,11 +22,12 @@ vital_death_aged_out <- function(dat,at)
     dat$attr$active[active][aged_out_index] <- 0
     dat$pop$Time_Death[active_evo][aged_out_index] <- at
 
-    #modify network
-    dat$nw <- deactivate.vertices(dat$nw,  onset = at,
-                                  terminus = Inf,
-                                  v  = active[aged_out_index],
-                                  deactivate.edges = TRUE)
+    # modify either network or edgelist version
+    # in edgelist mode, corresponding attributes on dat$attr will be deleted as well
+    dat <- EpiModel:::terminate_vertices(dat = dat,
+                                  at = at,
+                                  vids.to.terminate = active[aged_out_index])
+  }
     
   return(dat)
   

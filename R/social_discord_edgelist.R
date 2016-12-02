@@ -1,5 +1,5 @@
 #' @export
-social_discord_edgelist <- function (nw, status_vec, at) 
+social_discord_edgelist <- function (el, status_vec, at) 
 { 
   
   #######################################################
@@ -15,7 +15,7 @@ social_discord_edgelist <- function (nw, status_vec, at)
   #######################################################
   
   status  <- status_vec
-  edge_list  <- get.dyads.active(nw, at = at)
+  edge_list  <- el 
   if(length(edge_list)==0){return(NULL)}
   edge_list  <- edge_list[sample(1:nrow(edge_list)), , drop = FALSE]
   stat    <- matrix(status[edge_list], ncol = 2)

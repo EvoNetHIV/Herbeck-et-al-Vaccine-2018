@@ -21,7 +21,8 @@ initialize_restart<-function(x,param,init,control,s){
   dat$InfMat <- dat$InfMat[[s]]
   
   #attach fxns to calculte population statistics to "dat" object
-  popsumm_fxns <- summary_popsumm_fxns(generic_nodal_att_values= param$generic_nodal_att_values)
+  fast_el <- param$fast_edgelist
+  popsumm_fxns <- summary_popsumm_fxns(generic_nodal_att_values= param$generic_nodal_att_values,fast_el)
   dat$popsumm_fxns <- lapply(1:length(popsumm_fxns),function(x) popsumm_fxns[[x]]$model_value_fxn)
   names(dat$popsumm_fxns)<- names(popsumm_fxns)
   #---------------------
