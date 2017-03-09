@@ -49,7 +49,7 @@ evoparams$n_steps          = 365*40
 evoparams$popsumm_frequency = 45
 evoparams$poisson_birth_lambda = 0.0137*(evoparams$initial_pop/100)
 evoparams$trans_RR_age = 1.0
-evoparams$fast_edgelist = T
+#evoparams$fast_edgelist = T
 evoparams$vl_peak_agent_flag = T
 
 # Add parameters that are functions of other input parameters
