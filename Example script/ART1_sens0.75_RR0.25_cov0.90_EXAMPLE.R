@@ -10,11 +10,8 @@
 # NOTE: User must input a file path for output files on line 22.  #
 ###################################################################
 
-if(!require(devtools)) { install.packages("devtools") }
-library(devtools)
 devtools::install_github("statnet/tergmLite")
 devtools::install_github("statnet/EpiModel", ref = "fast_edgelist")
-devtools::install_github("EvoNetHIV/Herbeck-et-al-Vaccine-201x")
 
 library(evonet)
 
