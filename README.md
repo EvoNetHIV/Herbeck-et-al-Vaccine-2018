@@ -1,4 +1,4 @@
-# Herbeck-et-al-Vaccine-2017
+# Herbeck-et-al-Vaccine-2018
 
 [Link to the published manuscript](https://www.ncbi.nlm.nih.gov/pubmed/29241646)
 
